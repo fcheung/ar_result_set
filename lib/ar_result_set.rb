@@ -33,6 +33,3 @@ module ActiveRecord
   end
 end
 
-ActiveRecord::Base.class_eval do
-  include ActiveRecord::ResultSet
-end
