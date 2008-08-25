@@ -25,6 +25,19 @@ load(File.dirname(__FILE__) + "/schema.rb")
 
 require 'ar_result_set'
 require File.dirname(__FILE__) + '/../init'
+
+ActiveRecord::Base.connection.class.class_eval do
+  IGNORED_SQL = [/^PRAGMA/, /^SELECT currval/, /^SELECT CAST/, /^SELECT @@IDENTITY/, /^SELECT @@ROWCOUNT/]
+
+  def execute_with_counting(sql, name = nil, &block)
+    $query_count ||= 0
+    $query_count  += 1 unless IGNORED_SQL.any? { |r| sql =~ r }
+    execute_without_counting(sql, name, &block)
+  end
+
+  alias_method_chain :execute, :counting
+end
+
 class Test::Unit::TestCase
   fixtures :all
   def create_fixtures(*table_names)
@@ -33,6 +46,17 @@ class Test::Unit::TestCase
     else
       Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names)
     end
+  end
+
+  def assert_queries(num = 1)
+    $query_count = 0
+    yield
+  ensure
+    assert_equal num, $query_count, "#{$query_count} instead of #{num} queries were executed."
+  end
+
+  def assert_no_queries(&block)
+    assert_queries(0, &block)
   end
 
   self.use_transactional_fixtures = true

@@ -12,4 +12,12 @@ class ResultSetTest < Test::Unit::TestCase
     posts = Post.find :all, :order => 'title'
     assert_equal [], posts.first.comments.select {|c| c.body.empty?}
   end
+  
+  def test_load_associations
+    posts = Post.find :all, :order => 'title'
+    posts.load :comments
+    assert_no_queries do
+      assert_equal 3, posts.first.comments.length
+    end
+  end
 end
