@@ -1,0 +1,23 @@
+welcome_thanks:
+  post: welcome
+  body: thanks for the welcome
+  
+puppies_cute:
+  post: puppies
+  body: but they're so cute
+
+welcome_cool:
+  post: welcome
+  body: Cool, I hope to read more
+  
+puppies_yuck:
+  post: puppies
+  body: yuck that's why I hate them
+  
+puppies_needy:
+  post: puppies
+  body: and they're so needy
+  
+welcome_spam:
+  post: welcome
+  body: hi, visit cheappills.com

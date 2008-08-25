@@ -24,6 +24,7 @@ $LOAD_PATH.unshift(Test::Unit::TestCase.fixture_path)
 load(File.dirname(__FILE__) + "/schema.rb")
 
 class Test::Unit::TestCase
+  fixtures :all
   def create_fixtures(*table_names)
     if block_given?
       Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names) { yield }
