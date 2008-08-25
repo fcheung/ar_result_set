@@ -1,8 +1,7 @@
 ArResultSet
 ===========
 
-Introduction goes here.
-
+Testing ground for introducing a result-set proxy to ActiveRecord and then doing cool stuff with it.
 
 Example
 =======
