@@ -20,4 +20,17 @@ class ResultSetTest < Test::Unit::TestCase
       assert_equal 3, posts.first.comments.length
     end
   end
+  
+  def test_sets_result_set
+    posts = Post.find :all, :order => 'title'
+    posts.each {|p| assert_equal posts.object_id, p.result_set.object_id}
+  end
+  
+  def test_loads_other_association
+    posts = Post.find :all, :order => 'title'
+    posts[0].comments.length
+    assert_no_queries do
+      posts[1].comments.length
+    end
+  end
 end
