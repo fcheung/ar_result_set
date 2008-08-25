@@ -1,1 +1,1 @@
-# Include hook code here
+require 'ar_result_set'
