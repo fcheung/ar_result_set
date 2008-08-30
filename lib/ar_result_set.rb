@@ -9,8 +9,10 @@ module ActiveRecord
           alias_method_chain :find_every, :result_set
         end
       end
+      #todo: figure which associations we need to include this in.
       ActiveRecord::Associations::AssociationCollection.send :include, AssociationProxyExtensions
       ActiveRecord::Associations::HasManyThroughAssociation.send :include, AssociationProxyExtensions
+      ActiveRecord::Associations::HasOneThroughAssociation.send :include, HasOneThroughExtension
     end
 
     module AssociationProxyExtensions      
@@ -21,7 +23,23 @@ module ActiveRecord
       def find_target_with_result_set
         if @owner.result_set
           @owner.result_set.load @reflection.name
-          @target
+          @target          
+        else
+          find_target_without_result_set
+        end
+      end
+    end
+    
+    #This is a bit of a kludge: HasOneThrough descends from HasManyThrough.
+    #find_target calls super and then just returns the first item. However our find_target is override
+    #to load it for everyone and then return the target (so in the case of HasOneThrough a single object)
+    #HasOneThrough then calls first on that object and goes capow
+    module HasOneThroughExtension
+      def find_target
+        if @owner.result_set
+          @owner.result_set.load @reflection.name
+          puts "foo"
+          [@target]
         else
           find_target_without_result_set
         end

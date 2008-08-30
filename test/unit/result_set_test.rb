@@ -33,4 +33,10 @@ class ResultSetTest < Test::Unit::TestCase
       posts[1].comments.length
     end
   end
+  
+  
+  def test_has_one_through
+    posts = Post.find :all, :order => 'title'
+    assert_nothing_raised {posts.first.star_contributor}
+  end
 end
