@@ -3,6 +3,7 @@ ArResultSet
 
 Testing ground for introducing a result-set proxy to ActiveRecord and then doing cool stuff with it.
 
+If you are using Rails 2.1, then do not use in combination with has_one :through associations as a bug in preloading these associations will cause infinite recursion (fixed in http://github.com/rails/rails/commit/b7a37b742c0abd1df8ea48cc82f76385cc0c41ea)
 Example
 =======
 
