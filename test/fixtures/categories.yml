@@ -1,0 +1,11 @@
+general:
+  name: General
+  
+public:
+  name: Public
+  
+pets:
+  name: Pets
+  
+training:
+  name: Training

@@ -73,4 +73,13 @@ class ResultSetTest < Test::Unit::TestCase
       assert_nil contributors[2].profile
     end
   end
+  
+  def test_has_and_belongs_to_many
+    posts = Post.find :all, :order => 'title desc'
+    assert_equal categories(:general, :public), posts.first.categories
+    categories(:pets)
+    assert_no_queries do
+      assert_equal [categories(:pets)], posts[1].categories
+    end
+  end
 end

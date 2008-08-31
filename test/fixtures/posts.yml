@@ -1,8 +1,8 @@
 welcome:
   title: Welcome
   body: welcome to this plugin
-  
+  categories: general, public
 puppies:
   title: Puppies
   body: piss all over the floor
-  
+  categories: pets
