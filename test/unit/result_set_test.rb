@@ -33,12 +33,11 @@ class ResultSetTest < Test::Unit::TestCase
   
   def test_loads_has_many
     posts = Post.find :all, :order => 'title'
-    assert_equal 3, posts[0].comments.length
+    assert_equal 3, posts.first.comments.length
     assert_no_queries do
       assert_equal 3, posts[1].comments.length
     end
   end
-  
   
   def test_has_one_through_other_records_loaded
     posts = Post.find :all, :order => 'title desc'
@@ -69,7 +68,7 @@ class ResultSetTest < Test::Unit::TestCase
     profiles(:bob)
     assert_equal profiles(:fred), contributors[1].profile
     assert_no_queries do
-      assert_equal profiles(:bob), contributors[0].profile
+      assert_equal profiles(:bob), contributors.first.profile
       assert_nil contributors[2].profile
     end
   end
@@ -80,6 +79,22 @@ class ResultSetTest < Test::Unit::TestCase
     categories(:pets)
     assert_no_queries do
       assert_equal [categories(:pets)], posts[1].categories
+    end
+  end
+  
+  def test_has_many_through
+    posts = Post.find :all, :order => 'title desc'
+    assert_equal [contributors(:bob)], posts.first.contributors
+    assert_no_queries do
+      assert_equal [contributors(:bob)], posts[1].contributors
+    end
+  end
+  
+  def test_nested_load
+    posts = Post.find :all, :order => 'title desc'
+    assert_equal profiles(:bob), posts.first.contributors[0].profile
+    assert_no_queries do
+      assert_equal profiles(:bob), posts[1].contributors[0].profile
     end
   end
 end
