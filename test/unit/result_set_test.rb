@@ -55,4 +55,12 @@ class ResultSetTest < Test::Unit::TestCase
     posts = Post.find :all, :order => 'title asc'
     assert_equal 2, posts.first.last_comments.length
   end
+  
+  def test_belongs_to
+    contributions = Contribution.find :all
+    assert_equal contributors(:bob), contributions.first.contributor
+    assert_no_queries do
+      assert_equal contributors(:bob), contributions[1].contributor
+    end
+  end    
 end
