@@ -90,7 +90,7 @@ module ActiveRecord
       def preload_has_and_belongs_to_many_association_with_reset(records, reflection, preload_options={})
         reflection_name = reflection.name
         records.each {|record| record.send(reflection_name).send :reset_target!}
-        preload_has_and_belongs_to_many_association_without_reset records, records, preload_options
+        preload_has_and_belongs_to_many_association_without_reset records, reflection, preload_options
       end
       
       def preload_has_many_association_with_reset(records, reflection, preload_options={})
