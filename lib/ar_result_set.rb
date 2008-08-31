@@ -38,8 +38,11 @@ module ActiveRecord
       def find_target
         if @owner.result_set
           @owner.result_set.load @reflection.name
-          puts "foo"
-          [@target]
+          #this is a bit subtle - the load will have called set_xxx_target which will have created a 
+          #new instance of the association proxy  - return that value (our @target is still nil. boo)
+          ivar = "@#{@reflection.name}"
+          association = @owner.instance_variable_get ivar
+          association.nil? ? [] : [association.target]
         else
           find_target_without_result_set
         end

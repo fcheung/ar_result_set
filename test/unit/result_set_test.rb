@@ -26,17 +26,23 @@ class ResultSetTest < Test::Unit::TestCase
     posts.each {|p| assert_equal posts.object_id, p.result_set.object_id}
   end
   
-  def test_loads_other_association
+  def test_loads_has_many
     posts = Post.find :all, :order => 'title'
-    posts[0].comments.length
+    assert_equal 3, posts[0].comments.length
     assert_no_queries do
       posts[1].comments.length
     end
   end
   
   
-  def test_has_one_through
-    posts = Post.find :all, :order => 'title'
-    assert_nothing_raised {posts.first.star_contributor}
+  def test_has_one_through_other_records_loaded
+    posts = Post.find :all, :order => 'title desc'
+    posts.first.star_contributor
+    assert_no_queries {assert_equal 'bob', posts[1].star_contributor.name}
+  end
+  
+  def test_has_one_through_record_loaded
+    posts = Post.find :all, :order => 'title asc'
+    assert_equal contributors(:bob), posts.first.star_contributor
   end
 end
