@@ -15,6 +15,7 @@ module ActiveRecord
       ActiveRecord::Associations::AssociationProxy.send :include, AssociationProxyExtensions
       ActiveRecord::Associations::AssociationCollection.send :include, AssociationCollectionExtensions
       ActiveRecord::Associations::BelongsToAssociation.send :include, SingularAssociationExtension
+      ActiveRecord::Associations::HasOneAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasManyThroughAssociation.send :include, AssociationCollectionExtensions
       ActiveRecord::Associations::HasOneThroughAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasOneThroughAssociation.send :include, HasOneThroughExtension

@@ -62,5 +62,15 @@ class ResultSetTest < Test::Unit::TestCase
     assert_no_queries do
       assert_equal contributors(:bob), contributions[1].contributor
     end
-  end    
+  end
+  
+  def test_has_one
+    contributors = Contributor.find :all, :order => 'name asc'
+    profiles(:bob)
+    assert_equal profiles(:fred), contributors[1].profile
+    assert_no_queries do
+      assert_equal profiles(:bob), contributors[0].profile
+      assert_nil contributors[2].profile
+    end
+  end
 end

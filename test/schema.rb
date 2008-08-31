@@ -17,6 +17,9 @@ ActiveRecord::Schema.define(:version => 0) do
   
   create_table :contributors, :force => true do |t|
     t.column :name, :string
-    
+  end
+  
+  create_table :profiles, :force => true do |t|
+    t.column :contributor_id, :integer
   end
 end
