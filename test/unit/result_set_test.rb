@@ -50,4 +50,9 @@ class ResultSetTest < Test::Unit::TestCase
     posts = Post.find :all, :order => 'title asc'
     assert_equal contributors(:bob), posts.first.star_contributor
   end
+  
+  def test_dont_load_limited_associations
+    posts = Post.find :all, :order => 'title asc'
+    assert_equal 2, posts.first.last_comments.length
+  end
 end
