@@ -30,7 +30,7 @@ class ResultSetTest < Test::Unit::TestCase
     posts = Post.find :all, :order => 'title'
     assert_equal 3, posts[0].comments.length
     assert_no_queries do
-      posts[1].comments.length
+      assert_equal 3, posts[1].comments.length
     end
   end
   
