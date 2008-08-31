@@ -7,6 +7,8 @@ module ActiveRecord
         attr_accessor :result_set
         class << self
           alias_method_chain :find_every, :result_set
+          alias_method_chain :preload_has_and_belongs_to_many_association, :reset
+          alias_method_chain :preload_has_many_association, :reset
         end
       end
       #todo: figure which associations we need to include this in.
@@ -80,6 +82,21 @@ module ActiveRecord
     module ClassMethods
       def find_every_with_result_set(*args)
         ResultSetProxy.new(find_every_without_result_set(*args), self)
+      end
+      
+      #preload_assocations just appends to @target (which is fine normally since it's only ever
+      # called on freshly instantiated objects. we however have to clear out @target in between goes)
+
+      def preload_has_and_belongs_to_many_association_with_reset(records, reflection, preload_options={})
+        reflection_name = reflection.name
+        records.each {|record| record.send(reflection_name).send :reset_target!}
+        preload_has_and_belongs_to_many_association_without_reset records, records, preload_options
+      end
+      
+      def preload_has_many_association_with_reset(records, reflection, preload_options={})
+        reflection_name = reflection.name
+        records.each {|record| record.send(reflection_name).send :reset_target!}        
+        preload_has_many_association_without_reset records, reflection, preload_options
       end
     end
   end

@@ -19,6 +19,11 @@ class ResultSetTest < Test::Unit::TestCase
     assert_no_queries do
       assert_equal 3, posts.first.comments.length
     end
+    
+    posts.load :comments
+    assert_no_queries do
+      assert_equal 3, posts.first.comments.length
+    end
   end
   
   def test_sets_result_set
