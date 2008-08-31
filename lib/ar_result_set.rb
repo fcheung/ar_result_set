@@ -12,42 +12,60 @@ module ActiveRecord
         end
       end
       #todo: figure which associations we need to include this in.
-      ActiveRecord::Associations::AssociationCollection.send :include, AssociationProxyExtensions
-      ActiveRecord::Associations::HasManyThroughAssociation.send :include, AssociationProxyExtensions
+      ActiveRecord::Associations::AssociationProxy.send :include, AssociationProxyExtensions
+      ActiveRecord::Associations::AssociationCollection.send :include, AssociationCollectionExtensions
+      ActiveRecord::Associations::HasManyThroughAssociation.send :include, AssociationCollectionExtensions
+      ActiveRecord::Associations::HasOneThroughAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasOneThroughAssociation.send :include, HasOneThroughExtension
     end
 
-    module AssociationProxyExtensions      
-      def self.included(base)
-        base.alias_method_chain :find_target, :result_set
-      end
-      
+    module AssociationProxyExtensions
+        
       def find_target_with_result_set
         if @owner.result_set && @owner.result_set.length > 1 && !@reflection.options[:limit]
           @owner.result_set.load @reflection.name
-          @target          
+          return_target_after_preload
         else
           find_target_without_result_set
         end
       end
     end
     
-    #This is a bit of a kludge: HasOneThrough descends from HasManyThrough.
-    #find_target calls super and then just returns the first item. However our find_target is override
+    module AssociationCollectionExtensions
+      def self.included(base)
+        base.alias_method_chain :find_target, :result_set
+      end
+
+      def return_target_after_preload
+        @target
+      end
+    end
+    
+    module SingularAssociationExtension
+
+      def self.included(base)
+        base.alias_method_chain :find_target, :result_set
+      end
+
+      def return_target_after_preload
+        #this is a bit subtle - the load will have called set_xxx_target which will have created a 
+        #new instance of the association proxy  - return that value (our @target is still nil. boo)
+        ivar = "@#{@reflection.name}"
+        association = @owner.instance_variable_get ivar
+        association.nil? ? nil : association.target
+      end
+    end
+      
+    
+    #This is a bit of a kludge: HasOneThrough descends from HasManyThrough so
+    #find_target calls super and then just returns the first item. However our find_target is overriden
     #to load it for everyone and then return the target (so in the case of HasOneThrough a single object)
-    #HasOneThrough then calls first on that object and goes capow
+    #HasOneThrough then calls first on that object and goes capow. Irritatingly we can't include our HMT module
+    #in HMT without it also being included in HOT
     module HasOneThroughExtension
       def find_target
-        if @owner.result_set && @owner.result_set.length > 1
-          @owner.result_set.load @reflection.name
-          #this is a bit subtle - the load will have called set_xxx_target which will have created a 
-          #new instance of the association proxy  - return that value (our @target is still nil. boo)
-          ivar = "@#{@reflection.name}"
-          association = @owner.instance_variable_get ivar
-          association.nil? ? [] : [association.target]
-        else
-          find_target_without_result_set
-        end
+        result = find_target_with_result_set
+        result.is_a?( Array) ? result : [result]
       end
     end
     
