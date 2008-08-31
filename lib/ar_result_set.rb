@@ -24,7 +24,6 @@ module ActiveRecord
       
       def find_target_with_result_set
         if @owner.result_set && @owner.result_set.length > 1 && !@reflection.options[:limit]
-          puts @reflection.options[:limit]
           @owner.result_set.load @reflection.name
           @target          
         else
