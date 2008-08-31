@@ -1,0 +1,8 @@
+bob_welcome:
+  post: welcome
+  contributor: bob
+  
+bob_puppies:
+  post: puppies
+  contributor: bob
+  star: true
