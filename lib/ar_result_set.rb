@@ -38,7 +38,7 @@ module ActiveRecord
     #HasOneThrough then calls first on that object and goes capow
     module HasOneThroughExtension
       def find_target
-        if @owner.result_set
+        if @owner.result_set && @owner.result_set.length > 1
           @owner.result_set.load @reflection.name
           #this is a bit subtle - the load will have called set_xxx_target which will have created a 
           #new instance of the association proxy  - return that value (our @target is still nil. boo)
