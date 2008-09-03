@@ -1,6 +1,13 @@
 require 'ruby-debug'
 module ActiveRecord
   module ResultSet
+    
+    def detach!
+      return unless self.result_set
+      self.result_set.delete self
+      self.result_set = nil
+    end
+    
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do

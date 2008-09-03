@@ -97,4 +97,18 @@ class ResultSetTest < Test::Unit::TestCase
       assert_equal profiles(:bob), posts[1].contributors[0].profile
     end
   end
+  
+  def test_detach
+    posts = Post.find :all, :order => 'title desc'
+    result_set =  posts.first.result_set
+    post_to_detach = posts.first
+
+    assert result_set.include?(post_to_detach)
+    assert_not_nil post_to_detach.result_set
+    
+    post_to_detach.detach!
+    
+    assert_nil post_to_detach.result_set
+    assert !result_set.include?(post_to_detach)
+  end
 end

@@ -28,4 +28,7 @@ implications which have been completely ignored.
 
 A important consequence of this is that most of the time (basically whenever you have a record that was loaded as part of a collection of more than one element (collection at the point of load from the database - if 10 records turn into 10 one element has_manys then that still counts as a collection of 10 elements)) you associations will be eager loaded. If there are any subtle differences between eager loading and "normal" loading you'll be finding about them soon. At the time of writing, has many :through is slightly different with regards to order and condition options. There is no way to not get associations eager loaded if you have a problematic one.
 
+You can detach an element from it's result set with detach! This method is safe to call even if there is no result set. This will prevent associations on this method from being magically loaded (and prevent access to first level associations on this result set from trigger eager loads). This only applies one level down. Eg if we loaded an array of posts, triggered the load of the comments association on those post and then detached a post then the comments are all still part of the same result set (so detached_post.comments.author will load the author for all posts.)
+
+
 Copyright (c) 2008 Frederick Cheung, released under the MIT license
