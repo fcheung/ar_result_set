@@ -3,32 +3,36 @@ ArResultSet
 
 Testing ground for introducing a result-set proxy to ActiveRecord and then doing cool stuff with it.
 
-If you are using Rails 2.1, then do not use in combination with has_one :through associations as a bug in preloading these associations will cause infinite recursion (fixed in http://github.com/rails/rails/commit/b7a37b742c0abd1df8ea48cc82f76385cc0c41ea)
-
-Some types of associations produce unreliable results when eager loaded (eg has_many with limits) and so may produce undefined results. In the case of has_many with limits the plugin enforces this (ie lets the normal rails code run)
-
 The Fun Stuff
 =============
 
-You find calls look the same, but they now return a proxy object. Right now this allows you todo
+You find calls look the same, but they now return a proxy object. Right now this allows you to do
 
 users = User.find :all, ...
-users.load {:projects => :milestones}
+users.load :projects => :milestones
 
-to eager load a users projects and the milestones from that project.
+to load a user's projects and the milestones from each project. It takes arguments in the same format as a normal :include
+option (no coincidence - it's calling through to the same code. Some examples can be found at http://www.spacevatican.org/2008/8/8/nested-includes-and-joins)
 
 Better still:
 
-doing users[0].projects will guess that you want to access projects for everyone and go ahead and load that
+doing users[0].projects will guess that you want to access projects for everyone and go ahead and load all those projects
 
 and users[0].projects[0].milestones would load all milestones for all projects for all of the users.
 
-When a find is done a record tracks the result set it was part of via its result_set variable. This has obvious garbage collection
-implications which have been completely ignored.
+In other words you can forget about worrying what to :include to avoid the N+1 problem, the plugin will ensure that never happens
+When a find is done a record tracks the result set it was part of via its result_set variable.
 
 A important consequence of this is that most of the time (basically whenever you have a record that was loaded as part of a collection of more than one element (collection at the point of load from the database - if 10 records turn into 10 one element has_manys then that still counts as a collection of 10 elements)) you associations will be eager loaded. If there are any subtle differences between eager loading and "normal" loading you'll be finding about them soon. At the time of writing, has many :through is slightly different with regards to order and condition options. There is no way to not get associations eager loaded if you have a problematic one.
 
 You can detach an element from it's result set with detach! This method is safe to call even if there is no result set. This will prevent associations on this method from being magically loaded (and prevent access to first level associations on this result set from trigger eager loads). This only applies one level down. Eg if we loaded an array of posts, triggered the load of the comments association on those post and then detached a post then the comments are all still part of the same result set (so detached_post.comments.author will load the author for all posts.)
 
+Gotchas
+======
+This has obvious garbage collection implications which have been completely ignored - if you hold on to a single non detached object you are holding to the entire result set.
+
+If you are using Rails 2.1, then do not use in combination with has_one :through associations as a bug in preloading these associations will cause infinite recursion (fixed in http://github.com/rails/rails/commit/b7a37b742c0abd1df8ea48cc82f76385cc0c41ea)
+
+Some types of associations produce unreliable results when eager loaded (eg has_many with limits) and so may produce undefined results. In the case of has_many with limits the plugin enforces this (ie lets the normal rails code run)
 
 Copyright (c) 2008 Frederick Cheung, released under the MIT license
