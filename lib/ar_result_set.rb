@@ -23,7 +23,6 @@ module ActiveRecord
       ActiveRecord::Associations::BelongsToAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasOneAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasManyThroughAssociation.send :include, AssociationCollectionExtensions
-      ActiveRecord::Associations::HasOneThroughAssociation.send :include, SingularAssociationExtension
       ActiveRecord::Associations::HasOneThroughAssociation.send :include, HasOneThroughExtension
     end
 
@@ -48,19 +47,23 @@ module ActiveRecord
         @target
       end
     end
-    
-    module SingularAssociationExtension
 
-      def self.included(base)
-        base.alias_method_chain :find_target, :result_set
-      end
 
+    module SingularReturnAfterPreload 
       def return_target_after_preload
         #this is a bit subtle - the load will have called set_xxx_target which will have created a 
         #new instance of the association proxy  - return that value (our @target is still nil. boo)
         ivar = "@#{@reflection.name}"
         association = @owner.instance_variable_get ivar
         association.nil? ? nil : association.target
+      end
+    end
+    
+    module SingularAssociationExtension
+
+      def self.included(base)
+        base.alias_method_chain :find_target, :result_set
+        base.send :include, SingularReturnAfterPreload
       end
     end
       
@@ -71,6 +74,7 @@ module ActiveRecord
     #HasOneThrough then calls first on that object and goes capow. Irritatingly we can't include our HMT module
     #in HMT without it also being included in HOT
     module HasOneThroughExtension
+      include SingularReturnAfterPreload
       def find_target
         result = find_target_with_result_set
         result.is_a?( Array) ? result : [result]

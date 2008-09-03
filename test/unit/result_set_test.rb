@@ -39,6 +39,11 @@ class ResultSetTest < Test::Unit::TestCase
     end
   end
   
+  def test_has_one_through_single_records_loaded
+    post = Post.find :first, :order => 'title desc'
+    post.star_contributor #assert no infinite recursion
+  end
+
   def test_has_one_through_other_records_loaded
     posts = Post.find :all, :order => 'title desc'
     posts.first.star_contributor
