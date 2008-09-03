@@ -1,4 +1,3 @@
-require 'ruby-debug'
 module ActiveRecord
   module ResultSet
     
@@ -112,7 +111,8 @@ module ActiveRecord
       end
       
       #preload_assocations just appends to @target (which is fine normally since it's only ever
-      # called on freshly instantiated objects. we however have to clear out @target in between goes)
+      # called on freshly instantiated objects. we however have to clear out @target in between goes
+      # or else extra calls to load result in duplicate objects in @target)
 
       def preload_has_and_belongs_to_many_association_with_reset(records, reflection, preload_options={})
         reset_all_targets records, reflection
