@@ -21,9 +21,10 @@ doing users[0].projects will guess that you want to access projects for everyone
 and users[0].projects[0].milestones would load all milestones for all projects for all of the users.
 
 In other words you can forget about worrying what to :include to avoid the N+1 problem, the plugin will ensure that never happens
-When a find is done a record tracks the result set it was part of via its result_set variable.
 
-A important consequence of this is that most of the time (basically whenever you have a record that was loaded as part of a collection of more than one element (collection at the point of load from the database - if 10 records turn into 10 one element has_manys then that still counts as a collection of 10 elements)) you associations will be eager loaded. If there are any subtle differences between eager loading and "normal" loading you'll be finding about them soon. At the time of writing, has many :through is slightly different with regards to order and condition options. There is no way to not get associations eager loaded if you have a problematic one.
+When a find is done a record tracks the result set it was part of via its result_set variable (the result set may be something slightly immaterial, eg the one used to use some associations behind your back).
+
+A important consequence of all this is that most of the time (basically whenever you have a record that was loaded as part of a collection of more than one element (collection at the point of load from the database - if 10 records turn into 10 one element has_manys then that still counts as a collection of 10 elements)) you associations will be eager loaded. If there are any subtle differences between eager loading and "normal" loading you'll be finding about them soon. At the time of writing, has many :through is slightly different with regards to order and condition options. There is no way to not get associations eager loaded if you have a problematic one.
 
 You can detach an element from it's result set with detach! This method is safe to call even if there is no result set. This will prevent associations on this method from being magically loaded (and prevent access to first level associations on this result set from trigger eager loads). This only applies one level down. Eg if we loaded an array of posts, triggered the load of the comments association on those post and then detached a post then the comments are all still part of the same result set (so detached_post.comments.author will load the author for all posts.)
 
